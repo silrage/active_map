@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Active change elements on map</title>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+	<style type="text/css">
+		.leaflet-marker-icon {
+			-webkit-border-radius: 50%;
+			border-radius: 50%;
+			-webkit-box-shadow: 1px 1px 5px rgba(0,0,0,.4);
+		    box-shadow: 1px 1px 5px rgba(0,0,0,.4);
+		}
+		.leaflet-marker-icon.other-office {
+			background: rgb(39,251,0);
+		}
+		.leaflet-marker-icon.main-office {
+			background: rgb(251, 39, 0);
+		}
+	</style>
+
+</head>
+<body style="background: rgb(70,17,157);">
+	<a href=""><img class="logo" style="width:220px" src="http://iot.net868.ru/res/svg/logoRus.svg"></a>
+	<h3 style="color: white;">Карта партнеров сети</h3>
+	
+	<div id="map" style="height: 300px;"></div>
+	
+
+	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+	<script type="text/javascript">
+		console.log('load');
+		var locations = [
+		    //0key          1id   2regId  3geo       4lat       5className      6Desc           7Link
+			['г. Краснодар', 1,   23,     45.063813, 38.995689, 'main-office', 'Основной офис', '#link1'] ,
+			['г. Ростов-на-дону',2,61,47.219773, 39.712760, 'other-office', 'Офис<br/> г. Ростов-на-дону', '#link2'],
+		];
+
+		var markersA = [];
+		var markersB = [];
+		var regions = [];
+
+		//Loop through the initial array and add to two different arrays based on the specified variable
+		for(var i=0; i < locations.length; i++) {
+			if(!regions[ locations[i][2] ]) regions[ locations[i][2] ]=locations[i][0];
+		    switch (locations[i][2]) {
+		        case 23 :
+		            markersA.push(
+    	            	L.marker([locations[i][3], locations[i][4]], {icon: L.divIcon({className: locations[i][5]})} )
+		            	.bindPopup( locations[i][6]+'<br/><a href="'+locations[i][7]+'">Перейти</a>' )
+		            );
+		            break;
+		        case 61 :
+			        markersB.push(
+			        	L.marker([locations[i][3], locations[i][4]], {icon: L.divIcon({className: locations[i][5]})} )
+		            	.bindPopup( locations[i][6]+'<br/><a href="'+locations[i][7]+'">Перейти</a>' )
+			        );
+			        break;
+		        default :
+		            break;
+		    }
+		}
+		var tileLayer = {
+			'Map': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+			{
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+			})
+		};
+		var r23 = L.layerGroup(markersA);
+		var r61 = L.layerGroup(markersB);
+		var map = L.map('map', {
+			center: new L.LatLng(46.2, 38.8),
+			zoom: 6,
+			layers: [tileLayer['Map'], r23, r61],
+		});
+		var overlayMaps = {
+		    "Краснодар": r23,
+		    "Ростов-на-дону": r61
+		};
+		L.control.layers(tileLayer, overlayMaps, {position:'topleft'}).addTo(map)
+		// console.log(map);
+	</script>
+</body>
+</html>
