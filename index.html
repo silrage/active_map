@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8" />
 	<title>Active change elements on map</title>
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
@@ -18,6 +18,50 @@
 		.leaflet-marker-icon.main-office {
 			background: rgb(251, 39, 0);
 		}
+		.leaflet-marker-icon.custom-office {
+			background: rgb(255, 183, 52);
+		}
+		.leaflet-marker-icon.custom-office:before, .leaflet-marker-icon.custom-office:after {
+		    content: "";
+		    position: absolute;
+		    width: 100%;
+		    height: 100%;
+		    border: 1px solid transparent;
+		    -webkit-border-radius: 50%;
+		    border-radius: 50%;
+		}
+		.leaflet-marker-icon.custom-office:before {
+			-webkit-animation: mc-rippled .7s;
+			animation: mc-rippled 2s;
+		}
+		.leaflet-marker-icon.custom-office:after {
+			-webkit-animation: mc-rippled .7s;
+			animation: mc-rippled .7s;
+		}
+		@-webkit-keyframes mc-rippled {
+		  from {
+		    border-color: rgba(255, 183, 52, .8);
+		    -webkit-transform: scale(1);
+		  }
+		  to {
+		    border-color: rgba(255, 183, 52, 0);
+		    -webkit-transform: scale(3);
+		  }
+		}
+		@keyframes mc-rippled {
+		  from {
+		    border-color: rgba(255, 183, 52, .8);
+		    -webkit-transform: scale(1);
+		 	-moz-transform: scale(1);
+		 	transform: scale(1);
+		  }
+		  to {
+		    border-color: rgba(255, 183, 52, 0);
+		    -webkit-transform: scale(3);
+		 	-moz-transform: scale(3);
+		 	transform: scale(3);
+		  }
+		}
 	</style>
 
 </head>
@@ -26,16 +70,23 @@
 	<h3 style="color: white;">Карта партнеров сети</h3>
 	
 	<div id="map" style="height: 300px;"></div>
-	
+
+	<form action="" name="form">
+		<input id="geoLong" type="text" value="" placeholder="longitude" />
+		<input id="geoLati" type="text" value="" placeholder="latitude" />
+		<input id="geoSearch" type="button" value="Найти" onClick="search(document.getElementById('geoLong').value, document.getElementById('geoLati').value)" />
+	</form>
 
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 	<script type="text/javascript">
 		console.log('load');
 		var locations = [
 		    //0key          1id   2regId  3geo       4lat       5className      6Desc           7Link
-			['г. Краснодар', 1,   23,     45.063813, 38.995689, 'main-office', 'Основной офис', '#link1'] ,
+			['г. Краснодар', 1,   23,     45.063813, 38.995689, 'main-office', 'Основной офис', '#link1'],
 			['г. Ростов-на-дону',2,61,47.219773, 39.712760, 'other-office', 'Офис<br/> г. Ростов-на-дону', '#link2'],
 		];
+
+
 
 		var markersA = [];
 		var markersB = [];
@@ -80,6 +131,32 @@
 		};
 		L.control.layers(tileLayer, overlayMaps, {position:'topleft'}).addTo(map)
 		// console.log(map);
+		// window.document.form.on('submit', function(e){
+		// 	e.preventDefault();
+		// })
+
+		function search(long, lati) {
+			L.marker(
+				[lati, long],
+				{icon: L.divIcon({className: 'custom-office'})}
+				)
+			    .addTo(map);
+			map.panTo([lati, long]);
+				
+		}
+
+		map.on('click', function(e) {
+
+			console.log( e.latlng );
+			document.getElementById('geoLong').value = e.latlng.lng;
+			document.getElementById('geoLati').value = e.latlng.lat;
+			L.popup()
+				.setLatLng(e.latlng)
+			    .setContent('<p>Оу, здесь можно развернуть нашу сеть. Просто отправьте запрос нам и через несколько дней вы уже будете в сети!</p>')
+			    .openOn(map);
+
+			// e.openPopup();
+		} );
 	</script>
 </body>
 </html>
